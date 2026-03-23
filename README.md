@@ -4,7 +4,7 @@ Two scripts to find and remove YouTube channels you're subscribed to that haven'
 
 | Script | Purpose |
 |---|---|
-| `youtube_inactive_subs.py` | Scans all your subscriptions, flags channels inactive since **2023-03-18**, saves results to CSV |
+| `youtube_inactive_subs.py` | Scans all your subscriptions, prompts you for an inactivity threshold (in years), flags inactive channels, saves results to CSV |
 | `youtube_unsub_inactive.py` | Reads that CSV and bulk-unsubscribes from all inactive channels |
 
 ## Prerequisites
@@ -36,6 +36,7 @@ pip install google-api-python-client google-auth-oauthlib
 python youtube_inactive_subs.py
 ```
 
+- Prompts you for how many years of inactivity to use as the cutoff (default: 2)
 - Opens a browser for OAuth consent on first run (read-only access)
 - Checks every subscribed channel's last upload date
 - Outputs `inactive_channels.csv` with columns: `channel_title`, `channel_url`, `last_upload`, `status`, `subscription_id`, `channel_id`

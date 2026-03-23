@@ -1,7 +1,7 @@
 """
 YouTube Inactive Subscriptions Finder
 ======================================
-Lists all subscribed channels that haven't uploaded in the last 3 years.
+Lists all subscribed channels that haven't uploaded in a user-specified number of years.
 
 Setup:
   1. Go to https://console.cloud.google.com/
@@ -28,7 +28,6 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 SCOPES = ["https://www.googleapis.com/auth/youtube.readonly"]
-CUTOFF_DATE = datetime(2023, 3, 18, tzinfo=timezone.utc)
 CLIENT_SECRET_FILE = "client_secret.json"
 TOKEN_FILE = "token.json"
 OUTPUT_FILE = "inactive_channels.csv"
@@ -114,7 +113,28 @@ def get_last_upload_date(youtube, channel_id):
         raise
 
 
+def get_cutoff_years():
+    """Prompt user for how many years of inactivity to use as the cutoff."""
+    while True:
+        try:
+            years = input("How many years of inactivity to flag a channel? (default: 2): ").strip()
+            if not years:
+                return 2
+            years = int(years)
+            if years < 1:
+                print("Please enter a positive number.")
+                continue
+            return years
+        except ValueError:
+            print("Please enter a valid number.")
+
+
 def main():
+    years = get_cutoff_years()
+    now = datetime.now(timezone.utc)
+    cutoff_date = datetime(now.year - years, now.month, now.day, tzinfo=timezone.utc)
+    print(f"\nUsing cutoff date: {cutoff_date.date()} ({years} year{'s' if years != 1 else ''} ago)\n")
+
     print("Authenticating...")
     creds = authenticate()
     youtube = build("youtube", "v3", credentials=creds)
@@ -127,7 +147,7 @@ def main():
     inactive_count = 0
     for i, sub in enumerate(subs, 1):
         last_upload_dt, last_upload_str = get_last_upload_date(youtube, sub["channel_id"])
-        is_inactive = last_upload_dt is None or last_upload_dt < CUTOFF_DATE
+        is_inactive = last_upload_dt is None or last_upload_dt < cutoff_date
         status = "INACTIVE" if is_inactive else "ACTIVE"
         if is_inactive:
             inactive_count += 1
@@ -145,7 +165,7 @@ def main():
 
     print(f"\n{'='*60}")
     print(f"Total subscriptions: {len(subs)}")
-    print(f"Inactive (no upload since {CUTOFF_DATE.date()}): {inactive_count}")
+    print(f"Inactive (no upload since {cutoff_date.date()}): {inactive_count}")
     print(f"Active: {len(subs) - inactive_count}")
 
     with open(OUTPUT_FILE, "w", newline="", encoding="utf-8") as f:
