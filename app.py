@@ -3,18 +3,47 @@ YouTube Subscription Cleanup — Web UI
 ======================================
 Flask app wrapping yt_cleanup.py with a browser-based interface.
 
-Run:
-    pip install flask
+Just run:
     python app.py
 
+Dependencies are installed automatically on first run.
 Then open http://localhost:5000 in your browser.
 """
+
+import subprocess
+import sys
+
+REQUIRED_PACKAGES = {
+    "flask": "flask",
+    "google.auth": "google-auth",
+    "google_auth_oauthlib": "google-auth-oauthlib",
+    "googleapiclient": "google-api-python-client",
+    "tqdm": "tqdm",
+}
+
+
+def ensure_dependencies():
+    missing = []
+    for module, package in REQUIRED_PACKAGES.items():
+        try:
+            __import__(module)
+        except ImportError:
+            missing.append(package)
+    if missing:
+        print(f"Installing missing dependencies: {', '.join(missing)}")
+        subprocess.check_call(
+            [sys.executable, "-m", "pip", "install", *missing],
+            stdout=subprocess.DEVNULL,
+        )
+        print("Dependencies installed.\n")
+
+
+ensure_dependencies()
 
 import csv
 import json
 import os
 import queue
-import sys
 import threading
 import time
 from datetime import datetime, timezone

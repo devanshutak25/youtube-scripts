@@ -17,23 +17,19 @@ Find and remove YouTube channels you're subscribed to that haven't uploaded in y
    - APIs & Services → Credentials → Create Credentials → OAuth client ID
    - Application type: **Desktop app**
 5. Download the credentials JSON and save it as `client_secret.json` in this directory
-6. Install dependencies:
-
-```bash
-pip install google-api-python-client google-auth-oauthlib flask tqdm
-```
-
-(`tqdm` is optional — the CLI shows a nicer progress bar with it)
-
-## Web UI (Recommended)
-
-The easiest way to use this tool — no command-line knowledge needed.
+6. Run the app:
 
 ```bash
 python app.py
 ```
 
-Open **http://localhost:5000** in your browser. The UI has three sections:
+That's it — all Python dependencies (Flask, Google API client, etc.) are installed automatically on first run.
+
+## Web UI (Recommended)
+
+The easiest way to use this tool — no command-line knowledge needed. Just run `python app.py` and open **http://localhost:5000** in your browser.
+
+The UI has three sections:
 
 | Tab | What it does |
 |---|---|
@@ -44,6 +40,8 @@ Open **http://localhost:5000** in your browser. The UI has three sections:
 The web UI includes all the features of the CLI: batched API calls, resume support, quota tracking, and channel statistics.
 
 ## CLI Usage
+
+Dependencies are also auto-installed when using the CLI via `app.py`. If using `yt_cleanup.py` directly, install manually: `pip install google-api-python-client google-auth-oauthlib tqdm`
 
 ### Step 1: Scan subscriptions
 
